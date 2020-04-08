@@ -2,7 +2,7 @@
 
 First example implementation for a Spoon language server. Nothing here should be seen as stable.
 
-# What is a Language Server
+## What is a Language Server
 
 This repo is a first draft for a language server implementation for spoon.
 A language server can provide different feature to a client, like completion, syntax highlighting and code actions.
@@ -16,18 +16,18 @@ Using this protocol we can connect spoon to an IDE and provide features like ref
 See ExampleCodeAction for an example. The benefit of this is, that a user can use multiple language server for the same program language.
 So we don't have to provide already solved things like syntax highlighting, because a user can connect the same client to [redhat's](https://github.com/redhat-developer/vscode-java) and spoons language server.
 
-# how can I test it?
+## How can I test it?
 
 There are currently 2 different ways to test it.
 
-## with vscode
+### with vscode
 
 1. Build the source with *gradle build*.
 2. *cd client* and *npm install*
 3. open ./client in vscode and use the provided launch.json 
 4. You can connect java debugger on port 8000 
 
-## with different language client
+### with different language client
 
 (untested)
 Currently the server tries to connect to port 6009. In Start.java you can change the port. Let your client listen on that port. 
