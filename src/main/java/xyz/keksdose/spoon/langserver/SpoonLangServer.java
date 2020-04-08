@@ -1,7 +1,7 @@
 package xyz.keksdose.spoon.langserver;
 
 import java.util.concurrent.CompletableFuture;
-import org.eclipse.lsp4j.CompletionOptions;
+import org.eclipse.lsp4j.CodeLensOptions;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.InitializeParams;
@@ -18,8 +18,8 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 
 public class SpoonLangServer implements LanguageServer, LanguageClientAware {
 
-  private LanguageClient client = null;
-  private String workspaceRoot = null;
+  private LanguageClient client;
+  private String workspaceRoot;
 
   private FullTextDocumentService fullTextDocumentService = new FullTextDocumentService();
 
@@ -32,13 +32,11 @@ public class SpoonLangServer implements LanguageServer, LanguageClientAware {
 
   @Override
   public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
-    //workspaceRoot = params.getRootUri();
-    // var test = params.getCapabilities().getTextDocument();
-    // System.out.println(String.valueOf(workspaceRoot));
     ServerCapabilities capabilities = new ServerCapabilities();
     capabilities.setTextDocumentSync(TextDocumentSyncKind.Full);
-    capabilities.setCodeActionProvider(false);
-    //capabilities.setCompletionProvider(new CompletionOptions(true, null));
+    capabilities.setCodeActionProvider(true);
+    capabilities.setHoverProvider(true);
+
     return CompletableFuture.completedFuture(new InitializeResult(capabilities));
   }
 
@@ -64,8 +62,7 @@ public class SpoonLangServer implements LanguageServer, LanguageClientAware {
 
       @Override
       public void didChangeConfiguration(DidChangeConfigurationParams params) {
-        System.out.println(
-            "SpoonLangServer.getWorkspaceService().new WorkspaceService() {...}.didChangeConfiguration()");
+
       }
 
       @Override
@@ -74,42 +71,5 @@ public class SpoonLangServer implements LanguageServer, LanguageClientAware {
       }
     };
   }
-
-  //private FullTextDocumentService fullTextDocumentService = new FullTextDocumentService(client) {
-  //
-  //
-  //
-  //  @Override
-  //  public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
-  //      CompletionParams position) {
-  //    CompletionItem typescriptCompletionItem = new CompletionItem();
-  //    typescriptCompletionItem.setLabel("TypeScript");
-  //    typescriptCompletionItem.setKind(CompletionItemKind.Field);
-  //    typescriptCompletionItem.setData(1.0);
-  //    CompletionItem javascriptCompletionItem = new CompletionItem();
-  //    javascriptCompletionItem.setLabel("JavaScript");
-  //    javascriptCompletionItem.setKind(CompletionItemKind.Text);
-  //    javascriptCompletionItem.setData(2.0);
-  //
-  //    List<CompletionItem> completions = new ArrayList<>();
-  //    completions.add(typescriptCompletionItem);
-  //    completions.add(javascriptCompletionItem);
-  //
-  //    return CompletableFuture
-  //        .completedFuture(Either.forRight(new CompletionList(false, completions)));
-  //  }
-  //
-  //  @Override
-  //  public CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem item) {
-  //    if (item.getData().equals(1.0)) {
-  //      item.setDetail("TypeScript details");
-  //      item.setDocumentation("TypeScript documentation");
-  //    } else if (item.getData().equals(2.0)) {
-  //      item.setDetail("JavaScript details");
-  //      item.setDocumentation("JavaScript documentation");
-  //    }
-  //    return CompletableFuture.completedFuture(item);
-  //  }
-  //};
 
 }

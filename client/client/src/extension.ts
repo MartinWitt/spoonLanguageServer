@@ -8,12 +8,13 @@ import * as fs from "fs"
 import * as path from 'path';
 import * as net from 'net';
 import * as child_process from "child_process";
+import * as vscode from 'vscode';
 
 import { workspace, Disposable, ExtensionContext } from 'vscode';
 import { LanguageClient, LanguageClientOptions, SettingMonitor, StreamInfo } from 'vscode-languageclient';
 
 export function activate(context: ExtensionContext) {
-
+	console.log("starting spoon")
 	function createServer(): Promise<StreamInfo> {
 		return new Promise((resolve, reject) => {
 			var server = net.createServer((socket) => {
@@ -37,7 +38,7 @@ export function activate(context: ExtensionContext) {
 				// Start the child java process
 				let options = { cwd: workspace.rootPath };
 
-				let args = [
+				let args = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=127.0.0.1:8000",
 					'-jar',
 					path.resolve(context.extensionPath, '..', 'build', 'libs', 'spoon-langserver.jar'),
 					"6009"
@@ -79,7 +80,9 @@ export function activate(context: ExtensionContext) {
 
 	// Push the disposable to the context's subscriptions so that the 
 	// client can be deactivated on extension deactivation
+	console.log("spoon started")
 	context.subscriptions.push(disposable);
+
 }
 
 // MIT Licensed code from: https://github.com/georgewfraser/vscode-javac

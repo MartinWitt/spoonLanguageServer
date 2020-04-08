@@ -12,7 +12,7 @@ public class Compiler {
 
 
   private IncrementalLauncher launcher;
-  private String cachePath = "spoonCache";
+  private String cachePath = ".spoonCache";
   private File cacheDir;
 
   public Compiler() {
@@ -24,11 +24,11 @@ public class Compiler {
   private void createLauncher(Set<File> files) {
     launcher = new IncrementalLauncher(files, emptySet(), cacheDir, false);
     launcher.getEnvironment().setNoClasspath(true);
+    launcher.getEnvironment().setAutoImports(true);
     launcher.getEnvironment().disableConsistencyChecks();
   }
 
   public void addFile(Set<File> files) throws SpoonException {
-    System.out.println("Compiler.addFile()");
     try {
       createLauncher(files);
       launcher.buildModel();
@@ -37,7 +37,6 @@ public class Compiler {
       throw new SpoonException(e);
     }
 
-    System.out.println("Compiler.addFile()");
   }
 
   /**
