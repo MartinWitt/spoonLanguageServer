@@ -1,7 +1,6 @@
 package xyz.keksdose.spoon.langserver;
 
 import java.util.concurrent.CompletableFuture;
-import org.eclipse.lsp4j.CodeLensOptions;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.InitializeParams;
@@ -26,7 +25,7 @@ public class SpoonLangServer implements LanguageServer, LanguageClientAware {
   @Override
   public void connect(LanguageClient client) {
     this.client = client;
-    client.showMessage(new MessageParams(MessageType.Info, "Spoon verbunden"));
+    client.showMessage(new MessageParams(MessageType.Info, "Spoon connected"));
     fullTextDocumentService.setClient(client);
   }
 
@@ -57,7 +56,6 @@ public class SpoonLangServer implements LanguageServer, LanguageClientAware {
 
   @Override
   public WorkspaceService getWorkspaceService() {
-    // TODO Auto-generated method stub
     return new WorkspaceService() {
 
       @Override
@@ -67,7 +65,6 @@ public class SpoonLangServer implements LanguageServer, LanguageClientAware {
 
       @Override
       public void didChangeWatchedFiles(DidChangeWatchedFilesParams params) {
-        // TODO Auto-generated method stub
       }
     };
   }

@@ -2,7 +2,6 @@ package xyz.keksdose.spoon.langserver;
 
 import static java.util.Collections.emptySet;
 import java.io.File;
-import java.util.List;
 import java.util.Set;
 import spoon.IncrementalLauncher;
 import spoon.SpoonException;
