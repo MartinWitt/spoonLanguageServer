@@ -39,3 +39,4 @@ Currently the server tries to connect to port 6009. In Start.java you can change
 2. Example refactoring add a new comment line over the current element.
 
 ![](doc/gifs/hover.gif)
+![](doc/gifs/addString.gif)
