@@ -36,4 +36,6 @@ Currently the server tries to connect to port 6009. In Start.java you can change
 ## What is currently provided?
 
 1. More less gimmick hover, showing the ast element your mouse currently hovers.
-2. Example refactoring add a new comment line over the current element
+2. Example refactoring add a new comment line over the current element.
+
+![](doc/gifs/hover.gif)
