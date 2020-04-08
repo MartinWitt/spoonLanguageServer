@@ -1,5 +1,6 @@
 # SpoonLanguageServer
-First example implementation for a Spoon language server.
+
+First example implementation for a Spoon language server. Nothing here should be seen as stable.
 
 # What is a Language Server
 
@@ -9,13 +10,15 @@ Several language server client exist like vim, visual studio code, eclipse theia
 The communication between server and client is specified here [spec](https://microsoft.github.io/language-server-protocol/).
 The eclipse foundation provides an implementation of the protocol [here](https://github.com/eclipse/lsp4j).
 
-# Why? Want is the goal of this?
+## Why? Want is the goal of this?
 
 Using this protocol we can connect spoon to an IDE and provide features like refactoring.
 See ExampleCodeAction for an example. The benefit of this is, that a user can use multiple language server for the same program language.
 So we don't have to provide already solved things like syntax highlighting, because a user can connect the same client to [redhat's](https://github.com/redhat-developer/vscode-java) and spoons language server.
 
-# who can I test it?
+# how can I test it?
+
+There are currently 2 different ways to test it.
 
 ## with vscode
 
@@ -26,9 +29,11 @@ So we don't have to provide already solved things like syntax highlighting, beca
 
 ## with different language client
 
+(untested)
 Currently the server tries to connect to port 6009. In Start.java you can change the port. Let your client listen on that port. 
 
-# What is currently provided?
+
+## What is currently provided?
 
 1. More less gimmick hover, showing the ast element your mouse currently hovers.
 2. Example refactoring add a new comment line over the current element
