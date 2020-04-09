@@ -245,6 +245,4 @@ local.properties
 #.project
 .classpath
 .project
-gradlew
-gradlew.bat
 client/scripts/e2e.sh
