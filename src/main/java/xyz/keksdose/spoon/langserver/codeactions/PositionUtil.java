@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.logging.Logger;
 import org.eclipse.lsp4j.Position;
@@ -73,12 +72,24 @@ public class PositionUtil {
       return Optional.of(result.get(0));
     }
     if (result.size() > 1) {
+      List<CtElement> matchWithColumn = new ArrayList<>();
       // now we have multiple possible matches
       for (CtElement ctElement : result) {
         if (ctElement.getPosition().getColumn() <= position.getCharacter() + 1
             && ctElement.getPosition().getEndColumn() >= position.getCharacter() + 1) {
-          return Optional.of(ctElement);
+          matchWithColumn.add(ctElement);
         }
+      }
+      matchWithColumn
+          .removeIf(parent -> matchWithColumn.stream().anyMatch(child -> child.hasParent(parent)));
+      if (matchWithColumn.size() == 1) {
+        return Optional.of(matchWithColumn.get(0));
+      }
+      if (!matchWithColumn.isEmpty()) {
+        return matchWithColumn.stream()
+            .min((o1, o2) -> Integer.compare(
+                abs(o1.getPosition().getLine() - (position.getLine() + 1)),
+                abs(o2.getPosition().getLine() - (position.getLine() + 1))));
       }
     }
     if (result.size() > 1) {
@@ -134,4 +145,5 @@ public class PositionUtil {
     }
 
   }
+
 }
