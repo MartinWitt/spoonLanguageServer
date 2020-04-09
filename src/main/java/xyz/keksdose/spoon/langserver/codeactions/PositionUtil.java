@@ -51,11 +51,21 @@ public class PositionUtil {
   }
 
   public static Optional<CtElement> getClosestMatch(CtModel model, String uri, Position position) {
+    // Search the type with the uri first.
+    // if the type is unknown here, we can stop and return instant.
     Optional<CtType<?>> searchedType = findMatchingType(model, convertURItoPath(uri));
     if (searchedType.isEmpty()) {
       return Optional.empty();
     }
-    //copied form @monperrus
+    /* 
+    The searched Element should have the following attributes:
+      1. Valid position.
+      2. Range from start to end must include the searched line.
+      3. The column should match.
+    It's safe to assume every element without a valid position is not search.
+    LSP4J indexes Position by zero and spoon by 1. so we need to translate it.
+    */
+    // First we compare lines and check attribute 1 and 2.
     List<CtElement> result = searchedType.get().getElements(new Filter<CtElement>() {
       public boolean matches(CtElement elem) {
         if (!elem.getPosition().isValidPosition()) {
@@ -69,22 +79,33 @@ public class PositionUtil {
       }
     });
     if (result.size() == 1) {
+      // Only 1 match means we can stop here and return the result.
       return Optional.of(result.get(0));
     }
+    // If we have multiple possible matches we need to check more.
+    // Now we check attribute 3. The colum should match.
     if (result.size() > 1) {
       List<CtElement> matchWithColumn = new ArrayList<>();
-      // now we have multiple possible matches
       for (CtElement ctElement : result) {
         if (ctElement.getPosition().getColumn() <= position.getCharacter() + 1
             && ctElement.getPosition().getEndColumn() >= position.getCharacter() + 1) {
           matchWithColumn.add(ctElement);
         }
       }
+      /* now we have a elements, that match the column. This can be multiple. 
+      Now we remove all Elements, that have some child in the result. e.g.
+      public class foo{
+        int b;
+      }
+      assuming we search the position where b ist, class foo and int b are part of the result.
+      Removing every element, that has a child in the result solves this. 
+      */
       matchWithColumn
           .removeIf(parent -> matchWithColumn.stream().anyMatch(child -> child.hasParent(parent)));
       if (matchWithColumn.size() == 1) {
         return Optional.of(matchWithColumn.get(0));
       }
+      // if we cant resolve it with this lets find the nearest element to the line with the elements left.
       if (!matchWithColumn.isEmpty()) {
         return matchWithColumn.stream()
             .min((o1, o2) -> Integer.compare(
