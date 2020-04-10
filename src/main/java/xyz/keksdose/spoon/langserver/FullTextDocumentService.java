@@ -131,8 +131,9 @@ public class FullTextDocumentService implements TextDocumentService {
 
   @Override
   public CompletableFuture<List<Either<Command, CodeAction>>> codeAction(CodeActionParams params) {
-    List<CodeAction> actions = new CodeActionManager().getAvailable(compiler.getModel(),
-        params.getTextDocument().getUri(), params.getRange());
+    String uri = params.getTextDocument().getUri();
+    List<CodeAction> actions = new CodeActionManager().getAvailable(compiler.getModel(), uri,
+        params.getRange(), documents.get(uri));
     List<Either<Command, CodeAction>> resultList = new ArrayList<>();
     for (CodeAction codeAction : actions) {
       resultList.add(Either.forRight(codeAction));

@@ -4,6 +4,7 @@ import java.util.Optional;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.TextDocumentItem;
 import spoon.reflect.CtModel;
 import spoon.reflect.declaration.CtElement;
 
@@ -17,7 +18,7 @@ public interface ICodeAction {
     return PositionUtil.getClosestMatch(model, uri, position);
   }
 
-  public boolean isApplicable(CtModel model, String uri, Range range);
+  public boolean isApplicable(CtModel model, String uri, Range range, TextDocumentItem document);
 
-  public CodeAction apply(CtModel model, String uri, Range range);
+  public CodeAction apply(CtModel model, String uri, Range range, TextDocumentItem document);
 }

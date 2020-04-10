@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.TextDocumentItem;
 import spoon.reflect.CtModel;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtType;
@@ -165,6 +167,35 @@ public class PositionUtil {
       return Collections.emptyList();
     }
 
+  }
+
+  public static List<Position> convertRange(Range range, TextDocumentItem document) {
+    List<Position> result = new ArrayList<>();
+    // if the range spans only 1 line we need no lookups in the document 
+    Position start = range.getStart();
+    Position end = range.getEnd();
+    if (start.getLine() == end.getLine()) {
+      for (int i = start.getCharacter(); i <= end.getCharacter(); i++) {
+        result.add(new Position(start.getLine(), i));
+      }
+      return result;
+    }
+    Integer[] lineLength = document.getText().lines().map(String::length).toArray(Integer[]::new);
+    // first add the positions  form start to line end.
+    for (int i = start.getCharacter(); i <= lineLength[start.getLine()]; i++) {
+      result.add(new Position(start.getLine(), i));
+    }
+    // add the lines between first and last line
+    for (int i = start.getLine() + 1; i < end.getLine(); i++) {
+      for (int charIndex = 0; charIndex < lineLength.length; charIndex++) {
+        result.add(new Position(i, charIndex));
+      }
+    }
+    // add a positions in the last line till last char 
+    for (int i = 0; i <= end.getCharacter(); i++) {
+      result.add(new Position(end.getLine(), i));
+    }
+    return result;
   }
 
 }
