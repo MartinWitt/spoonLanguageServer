@@ -38,6 +38,7 @@ Currently the server tries to connect to port 6009. In Start.java you can change
 1. More less gimmick hover, showing the ast element your mouse currently hovers.
 2. Example refactoring add a new comment line over the current element.
 3. Invert if statements by negating the condition and swapping then and else statement.
+4. Adding comment over a local variable containing it's type, supporting var.
 
 ![](doc/gifs/hover.gif)
 ![](doc/gifs/addString.gif)
