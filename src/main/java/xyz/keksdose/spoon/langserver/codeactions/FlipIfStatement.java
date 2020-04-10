@@ -54,11 +54,8 @@ public class FlipIfStatement implements ICodeAction {
     TextEdit edit = new TextEdit();
 
     invertCode(ifStatement);
-
     edit.setNewText(ifStatement.toString());
-
     setNewRange(ifStatement, edit);
-
     setChanges(uri, documentEdit, edit);
     action.setEdit(documentEdit);
     return action;
