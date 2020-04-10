@@ -20,6 +20,24 @@ import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.UnaryOperatorKind;
 import spoon.support.reflect.eval.VisitorPartialEvaluator;
 
+/**
+ * Provides a code refactoring for inverting an if statement. This includes negating the condition.
+ * <pre> 
+ * if(condition) {
+ *  doSomething();
+ * } else {
+ *  doElse();
+ * }
+ * </pre>
+ * will be transformed to:
+ * <pre> 
+ * if(!condition) {
+ *  doElse();
+ * } else {
+ *  doSomething();
+ * }
+ * </pre>
+ */
 @AutoService(ICodeAction.class)
 public class FlipIfStatement implements ICodeAction {
 
@@ -40,7 +58,7 @@ public class FlipIfStatement implements ICodeAction {
   public CodeAction apply(CtModel model, String uri, Range range, TextDocumentItem document) {
     List<Position> rangeList = PositionUtil.convertRange(range, document);
     CtIf ifStatement = rangeList.stream()
-        .map(v -> getClosestMatch(model, uri, v))
+        .map(v -> getExactMatch(model, uri, v))
         .flatMap(Optional::stream)
         .filter(v -> v instanceof CtIf)
         .map(v -> (CtIf) v)
