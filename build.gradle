@@ -27,6 +27,9 @@ test {
     // Use junit platform for unit tests
     useJUnitPlatform()
 }
+sourceCompatibility = 11
+targetCompatibility = 11
+
 mainClassName = 'xyz.keksdose.spoon.langserver.Start'
 jar {
     manifest {
