@@ -246,3 +246,4 @@ local.properties
 .classpath
 .project
 client/scripts/e2e.sh
+.vscode/settings.json
