@@ -1,25 +1,23 @@
 {
-	"name": "lsp-sample",
-	"description": "A language server example",
-	"author": "Microsoft Corporation",
+	"name": "spoon-language-server",
+	"description": "VSCode part of a language server",
+	"author": "MartinWitt",
 	"license": "MIT",
-	"version": "1.0.0",
+	"version": "0.0.1",
+	"publisher": "MartinWitt",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-extension-samples"
+		"url": "https://github.com/MartinWitt/spoonLanguageServer"
 	},
-	"publisher": "vscode-samples",
 	"categories": [],
-	"keywords": [
-		"multi-root ready"
-	],
+	"keywords": [],
 	"engines": {
 		"vscode": "^1.43.0"
 	},
 	"activationEvents": [
-		"onLanguage:plaintext"
+		"onLanguage:java"
 	],
-	"main": "./client/out/extension",
+	"main": "./dist/extension/",
 	"contributes": {
 		"configuration": {
 			"type": "object",
@@ -46,23 +44,30 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",
 		"compile": "tsc -b",
 		"watch": "tsc -b -w",
-		"postinstall": "cd client && npm install && cd ..",
-		"test": "sh ./scripts/e2e.sh"
+		"vscode:prepublish": "webpack --mode production",
+		"webpack": "webpack --mode development",
+		"webpack-dev": "webpack --mode development --watch",
+		"test-compile": "tsc -p ./"
 	},
 	"devDependencies": {
 		"@types/mocha": "^5.2.7",
-		"mocha": "^6.2.2",
 		"@types/node": "^12.11.7",
-		"eslint": "^6.4.0",
 		"@typescript-eslint/parser": "^2.3.0",
+		"eslint": "^6.4.0",
+		"minimist": ">=0.2.1",
+		"mocha": "^6.2.2",
+		"ts-loader": "^6.2.2",
 		"typescript": "^3.8.3",
-		"minimist": ">=0.2.1"
+		"webpack": "^4.42.1",
+		"webpack-cli": "^3.3.11"
 	},
 	"dependencies": {
 		"path": "^0.12.7",
-		"ws": "^7.2.3"
+		"ws": "^7.2.3",
+		"vscode-languageclient": "^6.1.3",
+		"minimist": ">=0.2.1",
+		"@types/vscode": "^1.43.0"
 	}
 }
