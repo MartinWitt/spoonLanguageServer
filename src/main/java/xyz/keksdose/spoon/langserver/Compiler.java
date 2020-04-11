@@ -6,6 +6,7 @@ import java.util.Set;
 import spoon.IncrementalLauncher;
 import spoon.SpoonException;
 import spoon.reflect.CtModel;
+import spoon.support.compiler.VirtualFile;
 
 public class Compiler {
 
@@ -20,14 +21,17 @@ public class Compiler {
     createLauncher(emptySet());
   }
 
-  private void createLauncher(Set<File> files) {
-    launcher = new IncrementalLauncher(files, emptySet(), cacheDir, false);
+  private void createLauncher(Set<VirtualFile> files) {
+
+    launcher = new IncrementalLauncher(emptySet(), emptySet(), cacheDir, false);
+    files.forEach(launcher::addInputResource);
     launcher.getEnvironment().setNoClasspath(true);
     launcher.getEnvironment().setAutoImports(true);
+    launcher.getEnvironment().setShouldCompile(false);
     launcher.getEnvironment().disableConsistencyChecks();
   }
 
-  public void addFile(Set<File> files) throws SpoonException {
+  public void addFile(Set<VirtualFile> files) throws SpoonException {
     try {
       createLauncher(files);
       launcher.buildModel();

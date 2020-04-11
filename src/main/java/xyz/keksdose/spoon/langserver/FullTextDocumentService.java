@@ -32,6 +32,7 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import spoon.SpoonException;
 import spoon.reflect.declaration.CtElement;
+import spoon.support.compiler.VirtualFile;
 import xyz.keksdose.spoon.langserver.codeactions.CodeActionManager;
 import xyz.keksdose.spoon.langserver.codeactions.PositionUtil;
 
@@ -60,15 +61,18 @@ public class FullTextDocumentService implements TextDocumentService {
   public void didOpen(DidOpenTextDocumentParams params) {
     documents.put(params.getTextDocument().getUri(), params.getTextDocument());
     try {
-      Set<File> paths = documents.keySet().stream().map(t -> {
-        try {
-          return new URI(t);
-        } catch (URISyntaxException e) {
-          reportError(e.getMessage());
-          return null;
-        }
-      }).filter(v -> v != null).map(Path::of).map(Path::toFile).collect(Collectors.toSet());
-      compiler.addFile(paths);
+      Set<VirtualFile> files = documents.entrySet().stream().map(t ->
+        {
+          try {
+            URI uri = new URI(t.getKey());
+            String name = Path.of(uri).getFileName().toString();
+            return new VirtualFile(t.getValue().getText(), name);
+          } catch (URISyntaxException e) {
+            reportError(e.getMessage());
+            return null;
+          }
+        }).filter(v -> v != null).collect(Collectors.toSet());
+      compiler.addFile(files);
     } catch (SpoonException e) {
       reportError(e.getMessage());
     }
@@ -84,19 +88,21 @@ public class FullTextDocumentService implements TextDocumentService {
       }
 
       documents.get(uri).setText(changeEvent.getText());
-      try {
-        Set<File> paths = documents.keySet().stream().map(t -> {
+    }
+    try {
+      Set<VirtualFile> files = documents.entrySet().stream().map(t ->
+        {
           try {
-            return new URI(t);
+            String name = Path.of(new URI(t.getKey())).getFileName().toString();
+            return new VirtualFile(t.getValue().getText(), name);
           } catch (URISyntaxException e) {
             reportError(e.getMessage());
             return null;
           }
-        }).filter(v -> v != null).map(Path::of).map(Path::toFile).collect(Collectors.toSet());
-        compiler.addFile(paths);
-      } catch (SpoonException e) {
-        reportError(e.getMessage());
-      }
+        }).filter(v -> v != null).collect(Collectors.toSet());
+      compiler.addFile(files);
+    } catch (SpoonException e) {
+      reportError(e.getMessage());
     }
   }
 
@@ -108,6 +114,24 @@ public class FullTextDocumentService implements TextDocumentService {
 
   @Override
   public void didSave(DidSaveTextDocumentParams params) {
+
+    documents.get(params.getTextDocument().getUri()).setText(params.getText());
+    try {
+      Set<VirtualFile> files = documents.entrySet().stream().map(t ->
+        {
+          try {
+            URI uri = new URI(t.getKey());
+            String name = Path.of(uri).getFileName().toString();
+            return new VirtualFile(t.getValue().getText(), name);
+          } catch (URISyntaxException e) {
+            reportError(e.getMessage());
+            return null;
+          }
+        }).filter(v -> v != null).collect(Collectors.toSet());
+      compiler.addFile(files);
+    } catch (SpoonException e) {
+      reportError(e.getMessage());
+    }
   }
 
   public void setClient(LanguageClient client) {

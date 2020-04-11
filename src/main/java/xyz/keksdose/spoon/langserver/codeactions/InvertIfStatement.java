@@ -39,7 +39,7 @@ import spoon.support.reflect.eval.VisitorPartialEvaluator;
  * </pre>
  */
 @AutoService(ICodeAction.class)
-public class FlipIfStatement implements ICodeAction {
+public class InvertIfStatement implements ICodeAction {
 
   @Override
   public boolean isApplicable(CtModel model, String uri, Range range, TextDocumentItem document) {
