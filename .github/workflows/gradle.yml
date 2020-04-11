@@ -18,7 +18,5 @@ jobs:
         run: ./gradlew build
       - name: Setup Node.js environment
         uses: actions/setup-node@v1.4.1
-      - name: switch folder
-      - run: cd ./client
       - name: install
-      - run: npmm install & npm install vsce
+      - run: cd ./client && npm install && npm install vsce
