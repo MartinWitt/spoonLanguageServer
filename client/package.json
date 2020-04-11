@@ -44,10 +44,8 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublishOld": "cd client && npm run update-vscode && cd .. && npm run compile",
 		"compile": "tsc -b",
 		"watch": "tsc -b -w",
-		"postinstall": "cd client && npm install && cd ..",
 		"vscode:prepublish": "webpack --mode production",
 		"webpack": "webpack --mode development",
 		"webpack-dev": "webpack --mode development --watch",
