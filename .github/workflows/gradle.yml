@@ -5,9 +5,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
 
 jobs:
   build:
@@ -20,13 +18,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v1.4.1
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
-    - name: install npm dependcies
-      run: cd client && npm install && npm install -g vsce
-    - name: package extension
-      run: cd client && vsce package
