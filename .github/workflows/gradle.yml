@@ -19,4 +19,5 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v1.4.1
       - name: install
-        run: cd ./client && npm install && npm install vsce
+        run: cd ./client && npm install && npm install vsce && vsce package
+      
