@@ -23,6 +23,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2-preview
         with:
-          name: "spoon-language-server-0.0.1.vsix"
-          path: "./client"
+          name: "./client/spoon-language-server-0.0.1.vsix"
+
       
