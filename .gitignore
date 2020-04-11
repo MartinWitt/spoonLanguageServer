@@ -247,3 +247,6 @@ local.properties
 .project
 client/scripts/e2e.sh
 .vscode/settings.json
+client/spoon-language-server-0.0.1.vsix
+.spoonCache/cache-info
+.spoonCache/model

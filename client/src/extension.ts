@@ -36,7 +36,8 @@ export function activate(context: ExtensionContext) {
 
 				let args = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=127.0.0.1:8000",
 					'-jar',
-					path.resolve(context.extensionPath, '..', 'build', 'libs', 'spoon-langserver.jar'),
+					// path.resolve(context.extensionPath, '..', 'build', 'libs', 'spoon-langserver.jar'),
+					path.resolve(context.extensionPath, 'spoon-langserver.jar'),
 					"6009"
 				]
 
