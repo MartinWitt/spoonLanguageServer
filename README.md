@@ -22,10 +22,17 @@ There are currently 2 different ways to test it.
 
 ### with vscode
 
-1. Build the source with *gradle build*.
-2. *cd client* and *npm install*
-3. open ./client in vscode and use the provided launch.json 
-4. You can connect java debugger on port 8000 
+You can either use the prebuild extension found under **actions** or:
+requires 
+- java 11+
+- node.js
+- gradle 4.6.1 or use wrapper
+
+1. Build the source with **gradle build**.
+2. **cd ./client && npm install && npm install -g vsce && vsce package**
+3. **cd client** and **code --install-extension spoon-language-server-0.0.1.vsix**
+4. If you start VSCode now, it should be visibly under extensions.
+5. java debugger runs on port 8000
 
 ### with different language client
 
