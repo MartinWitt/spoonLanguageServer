@@ -1,0 +1,39 @@
+name: Deploy Nightly
+on:
+  schedule:
+    - cron: '0 4 * * *' # run at 2 AM UTC
+
+jobs:
+  nightly:
+    name: Deploy nightly
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew build
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v1.4.1
+      - name: install
+        run: cd ./client && npm install && npm install -g vsce && vsce package
+      - name: Deploy Windows release
+        if: matrix.os == 'windows-latest'
+        uses: WebFreak001/deploy-nightly@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+        with:
+          upload_url: https://uploads.github.com/repos/MartinWitt/spoonLanguageServer/releases/25434395/assets{?name,label} # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases in your browser and copy the full "upload_url" value including the {?name,label} part
+          release_id: 25434395 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+          asset_path: ./client/spoon-language-server-0.0.1.vsix # path to archive to upload
+          asset_name: spoon-langserver-nightly-$$.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+          asset_content_type: application/vsix # required by GitHub API
+          max_releases: 3 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
