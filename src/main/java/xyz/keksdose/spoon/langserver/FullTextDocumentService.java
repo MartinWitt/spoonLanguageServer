@@ -52,7 +52,7 @@ public class FullTextDocumentService implements TextDocumentService {
 
   public void reportError(String msg) {
     if (client != null) {
-      client.showMessage(new MessageParams(MessageType.Error, msg));
+      // client.showMessage(new MessageParams(MessageType.Error, msg));
     }
     Logger.getAnonymousLogger().info(msg);
   }
