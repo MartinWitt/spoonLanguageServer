@@ -22,13 +22,12 @@ public class ExampleCodeAction implements ICodeAction {
 
   @Override
   public CodeAction apply(CtModel model, String uri, Range range, TextDocumentItem document) {
-    CtElement element = getExactMatch(model, uri, range.getStart()).get();
     var action = new CodeAction();
     action.setTitle("insert spoon string");
     WorkspaceEdit documentEdit = new WorkspaceEdit();
     TextEdit edit = new TextEdit();
-    edit.setRange(range);
-    edit.setNewText("//spoon generates new text here\n" + element.toString());
+    edit.setRange(new Range(range.getStart(), range.getStart()));
+    edit.setNewText("//spoon generates new text here\n");
     Map<String, List<TextEdit>> changesByName = new HashMap<>();
     changesByName.put(uri, List.of(edit));
     documentEdit.setChanges(changesByName);

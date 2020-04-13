@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.Set;
 import spoon.IncrementalLauncher;
 import spoon.SpoonException;
+import spoon.compiler.Environment.PRETTY_PRINTING_MODE;
 import spoon.reflect.CtModel;
 import spoon.support.compiler.VirtualFile;
 
