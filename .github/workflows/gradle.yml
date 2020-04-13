@@ -1,6 +1,8 @@
-name: Java CI
-
-on: [push]
+name: master release
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
