@@ -3,6 +3,7 @@ package xyz.keksdose.spoon.langserver.codeactions;
 import static java.lang.Math.abs;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -139,7 +140,8 @@ public class PositionUtil {
 
   private static Map<List<String>, CtType<?>> createMap(CtModel model) {
     Map<List<String>, CtType<?>> result = new HashMap<>();
-    model.getAllTypes().stream()
+    model.getAllTypes()
+        .stream()
         .forEach(v -> result.put(Arrays.asList(v.getQualifiedName().split("\\.")), v));
     return result;
   }
@@ -157,16 +159,17 @@ public class PositionUtil {
     try {
       Path path = Path.of(new URI(uri));
       List<String> pathParts = new ArrayList<>();
-      for (int i = 0; i < path.getNameCount(); i++) {
+      for (int i = path.getNameCount() - 1; i >= 0; i--) {
         pathParts.add(path.getName(i).toString());
       }
-      Collections.reverse(pathParts);
       return pathParts;
     } catch (URISyntaxException e) {
       Logger.getAnonymousLogger().info(e.getMessage());
       return Collections.emptyList();
+    } catch (FileSystemNotFoundException e) {
+      return Collections.emptyList();
+      // this exception comes, when we get a text document via IDEs gotoSourceFile and it's not part of the project files. 
     }
-
   }
 
   public static List<Position> convertRange(Range range, TextDocumentItem document) {
