@@ -30,8 +30,9 @@ public class UnusedVariable extends DiagnosticVisitor {
       Position end =
           new Position(sourcePosition.getEndLine() - 1, sourcePosition.getEndColumn() - 1);
       diagnostic.setRange(new Range(start, end));
-      diagnostic.setMessage("unused variable found");
+      diagnostic.setMessage("The variable is not used and can be removed");
       diagnostic.setSeverity(DiagnosticSeverity.Warning);
+      diagnostic.setSource("Spoon");
       result.add(diagnostic);
     }
   }

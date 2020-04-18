@@ -1,100 +1,50 @@
 package xyz.keksdose.spoon.langserver.codeactions;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import com.google.auto.service.AutoService;
+import org.eclipse.lsp4j.CodeAction;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.TextEdit;
+import org.eclipse.lsp4j.WorkspaceEdit;
+import spoon.reflect.code.CtLocalVariable;
+import spoon.reflect.cu.SourcePosition;
+import spoon.reflect.visitor.filter.VariableAccessFilter;
 
-public class UnusedVariable {
-/*
-  private static final String COMMAND_NAME = "unused field";
+@AutoService(RefactorVisitor.class)
+public class UnusedVariable extends RefactorVisitor {
 
-  public boolean isApplicable(CtModel model, String uri, Range range, TextDocumentItem document) {
-    List<Position> rangeList = PositionUtil.convertRange(range, document);
-    List<CtField<?>> assignment = rangeList.stream()
-        .map(v -> getExactMatch(model, uri, v))
-        .flatMap(Optional::stream)
-        .filter(v -> v instanceof CtField)
-        .map(v -> (CtField<?>) v)
-        .distinct()
-        .filter(v->v.getReference() != null)
-        .collect(Collectors.toList());
-        if(assignment.size() != 1) {
-          return false;
-        }
-        boolean unused = model.getElements(new TypeFilter<>(CtFieldAccess.class) {
-          @Override
-          public boolean matches(CtFieldAccess element) {
-            return element.getVariable().equals(assignment.get(0).getReference());
-          }
-        }).isEmpty();
-      return assignment.size() == 1 && unused ;
-  }
+  private static final String COMMAND_NAME = "Remove unused field with assignment";
+  private CodeAction result;
 
-  public CodeAction apply(CtModel model, String uri, Range range, TextDocumentItem document) {
-    List<Position> rangeList = PositionUtil.convertRange(range, document);
-    CtField<?> variable = rangeList.stream()
-        .map(v -> getExactMatch(model, uri, v))
-        .flatMap(Optional::stream)
-        .filter(v -> v instanceof CtField)
-        .map(v -> (CtField<?>) v)
-        .distinct()
-        .filter(v->v.getReference() != null)
-        .findAny()
-        .get();
+  @Override
+  public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
+    if (model.getElements(new VariableAccessFilter<>(localVariable.getReference())).isEmpty()) {
+      CodeAction action = new CodeAction();
+      action.setTitle(COMMAND_NAME);
+      WorkspaceEdit edit = new WorkspaceEdit();
+      TextEdit remove = new TextEdit();
+      remove.setNewText("");
 
-        CodeAction action = new CodeAction(COMMAND_NAME);
-    
-        TextEdit remove = new TextEdit();
-        int startLine = variable.getType().getPosition().getLine()-1;
-        int startChar = variable.getType().getPosition().getColumn()-1;
-        Position start = new Position(startLine, startChar);
-    
-        int endLine;
-        int endChar; 
-        if(variable.getDefaultExpression() != null) {
-        endLine = variable.getDefaultExpression().getPosition().getEndLine()-1;
-        //because statements end with ";"
-        endChar = variable.getDefaultExpression().getPosition().getEndColumn() +1; 
-        }
-        else {
-          endLine = variable.getPosition().getLine()-1;
-          endChar = variable.getPosition().getEndColumn();
-        }
-        Position end = new Position(endLine, endChar);
-        remove.setRange(new Range(start, end));
-        remove.setNewText("");
-
-        WorkspaceEdit documentEdit = new WorkspaceEdit();
-        documentEdit.setChanges(Map.of(uri, List.of(remove)));
-        action.setEdit(documentEdit);
-    return action;
-  }
-
-  public List<Diagnostic> highlightRefactoring(CtModel model, String uri, Range range,
-      TextDocumentItem document) {
-    List<Position> rangeList = PositionUtil.convertRange(range, document);
-    List<Diagnostic> result = new ArrayList<>();
-    for (Position position : rangeList) {
-      if (getExactMatch(model, uri, position).stream()
-          .filter(v -> v instanceof CtField)
-          .map(v -> (CtField<?>) v)
-          .distinct()
-          .filter(v -> v.getReference() != null)
-          .count() > 0) {
-        CtField<?> field = (CtField<?>) getExactMatch(model, uri, position).get();
-        boolean unused = model.getElements(new TypeFilter<>(CtFieldAccess.class) {
-          @Override
-          public boolean matches(CtFieldAccess element) {
-            return element.getVariable().equals(field.getReference());
-          }
-        }).isEmpty();
-        if (unused) {
-          Diagnostic diagnostic = new Diagnostic(new Range(position, position),
-              "Remove unused field", DiagnosticSeverity.Warning, "spoon");
-          result.add(diagnostic);
-        }
-      }
+      SourcePosition sourcePosition = localVariable.getPosition();
+      Position start = getStartPosition(localVariable);
+      Position end = new Position(sourcePosition.getEndLine() - 1, sourcePosition.getEndColumn());
+      remove.setRange(new Range(start, end));
+      edit.setChanges(Map.of(uri, List.of(remove)));
+      action.setEdit(edit);
+      result = action;
     }
-    return result;
   }
 
-*/
+  private Position getStartPosition(CtLocalVariable<?> localVariable) {
+    SourcePosition position = localVariable.getType().getPosition();
+    return new Position(position.getLine() - 1, position.getColumn() - 1);
+  }
 
+  @Override
+  public Optional<CodeAction> getResult() {
+    return Optional.ofNullable(result);
+  }
 }

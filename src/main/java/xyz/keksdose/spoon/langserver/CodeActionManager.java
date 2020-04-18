@@ -23,12 +23,10 @@ public class CodeActionManager {
 
   public CodeActionManager() {
     refactorLoader = ServiceLoader.load(RefactorVisitor.class);
-    refactorLoader.reload();
     diagnosticLoader = ServiceLoader.load(DiagnosticVisitor.class);
-    diagnosticLoader.reload();
   }
 
-  public List<CodeAction> getAvailableCodeActions(CtModel model, String uri, Range range,
+  public Set<CodeAction> getAvailableCodeActions(CtModel model, String uri, Range range,
       TextDocumentItem document) {
     List<Position> positions = PositionUtil.convertRange(range, document);
     Set<CtElement> elements = new HashSet<>();
@@ -36,7 +34,7 @@ public class CodeActionManager {
       PositionUtil.getExactMatch(model, uri, position).ifPresent(elements::add);;
     }
 
-    List<CodeAction> available = new ArrayList<>();
+    Set<CodeAction> available = new HashSet<>();
     List<RefactorVisitor> visitor = new ArrayList<>();
     refactorLoader.iterator().forEachRemaining(v ->
       {
