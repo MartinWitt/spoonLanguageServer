@@ -35,7 +35,7 @@ public class SpoonLangServer implements LanguageServer, LanguageClientAware {
     capabilities.setTextDocumentSync(TextDocumentSyncKind.Full);
     capabilities.setCodeActionProvider(true);
     capabilities.setHoverProvider(true);
-
+    //capabilities.setCodeLensProvider(new CodeLensOptions(true));
     return CompletableFuture.completedFuture(new InitializeResult(capabilities));
   }
 
@@ -68,5 +68,6 @@ public class SpoonLangServer implements LanguageServer, LanguageClientAware {
       }
     };
   }
+
 
 }

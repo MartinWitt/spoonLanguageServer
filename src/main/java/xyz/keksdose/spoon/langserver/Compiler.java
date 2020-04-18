@@ -3,16 +3,15 @@ package xyz.keksdose.spoon.langserver;
 import static java.util.Collections.emptySet;
 import java.io.File;
 import java.util.Set;
-import spoon.IncrementalLauncher;
+import spoon.Launcher;
 import spoon.SpoonException;
-import spoon.compiler.Environment.PRETTY_PRINTING_MODE;
 import spoon.reflect.CtModel;
 import spoon.support.compiler.VirtualFile;
 
 public class Compiler {
 
 
-  private IncrementalLauncher launcher;
+  private Launcher launcher;
   private String cachePath = ".spoonCache";
   private File cacheDir;
 
@@ -24,7 +23,7 @@ public class Compiler {
 
   private void createLauncher(Set<VirtualFile> files) {
 
-    launcher = new IncrementalLauncher(emptySet(), emptySet(), cacheDir, false);
+    launcher = new Launcher();
     files.forEach(launcher::addInputResource);
     launcher.getEnvironment().setNoClasspath(true);
     launcher.getEnvironment().setAutoImports(true);
@@ -36,7 +35,6 @@ public class Compiler {
     try {
       createLauncher(files);
       launcher.buildModel();
-      launcher.saveCache();
     } catch (Exception e) {
       throw new SpoonException(e);
     }
@@ -51,5 +49,4 @@ public class Compiler {
   public CtModel getModel() {
     return launcher.getModel();
   }
-
 }
