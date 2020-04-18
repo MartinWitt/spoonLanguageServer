@@ -4,15 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import com.google.auto.service.AutoService;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.TextDocumentItem;
 import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.WorkspaceEdit;
-import spoon.reflect.CtModel;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtIf;
 import spoon.reflect.code.CtStatement;
@@ -38,46 +35,11 @@ import spoon.support.reflect.eval.VisitorPartialEvaluator;
  * }
  * </pre>
  */
-@AutoService(ICodeAction.class)
-public class InvertIfStatement implements ICodeAction {
+@AutoService(RefactorVisitor.class)
+public class InvertIfStatement extends RefactorVisitor {
 
-  @Override
-  public boolean isApplicable(CtModel model, String uri, Range range, TextDocumentItem document) {
-    List<Position> rangeList = PositionUtil.convertRange(range, document);
-    List<CtIf> localVariables = rangeList.stream()
-        .map(v -> getExactMatch(model, uri, v))
-        .flatMap(Optional::stream)
-        .filter(v -> v instanceof CtIf)
-        .map(v -> (CtIf) v)
-        .filter(v -> v.getElseStatement() != null)
-        .collect(Collectors.toList());
-    return localVariables.size() == 1;
-  }
+  private CodeAction result;
 
-  @Override
-  public CodeAction apply(CtModel model, String uri, Range range, TextDocumentItem document) {
-    List<Position> rangeList = PositionUtil.convertRange(range, document);
-    CtIf ifStatement = rangeList.stream()
-        .map(v -> getExactMatch(model, uri, v))
-        .flatMap(Optional::stream)
-        .filter(v -> v instanceof CtIf)
-        .map(v -> (CtIf) v)
-        .filter(v -> v.getElseStatement() != null)
-        .findAny()
-        .get();
-
-    CodeAction action = new CodeAction();
-    action.setTitle("invert if statement");
-    WorkspaceEdit documentEdit = new WorkspaceEdit();
-    TextEdit edit = new TextEdit();
-
-    invertCode(ifStatement);
-    edit.setNewText(ifStatement.toString());
-    setNewRange(ifStatement, edit);
-    setChanges(uri, documentEdit, edit);
-    action.setEdit(documentEdit);
-    return action;
-  }
 
   private void setChanges(String uri, WorkspaceEdit documentEdit, TextEdit edit) {
     Map<String, List<TextEdit>> changesByName = new HashMap<>();
@@ -107,5 +69,27 @@ public class InvertIfStatement implements ICodeAction {
         ifStatement.getPosition().getEndColumn());
     Range newRange = new Range(newStart, newEnd);
     edit.setRange(newRange);
+  }
+
+  @Override
+  public Optional<CodeAction> getResult() {
+    return Optional.ofNullable(result);
+  }
+
+  @Override
+  public void visitCtIf(CtIf ifElement) {
+    ifElement = ifElement.clone();
+    CodeAction action = new CodeAction();
+    action.setTitle("invert if statement");
+    WorkspaceEdit documentEdit = new WorkspaceEdit();
+    TextEdit edit = new TextEdit();
+
+    invertCode(ifElement);
+    String newText = ifElement.toString();
+    edit.setNewText(newText);
+    setNewRange(ifElement, edit);
+    setChanges(uri, documentEdit, edit);
+    action.setEdit(documentEdit);
+    this.result = action;
   }
 }

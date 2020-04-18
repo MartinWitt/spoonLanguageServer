@@ -28,6 +28,7 @@ public class PositionUtil {
   }
 
   public static Optional<CtElement> getExactMatch(CtModel model, String uri, Position position) {
+    try{
     Optional<CtType<?>> searchedType = findMatchingType(model, convertURItoPath(uri));
     if (searchedType.isEmpty()) {
       return Optional.empty();
@@ -52,9 +53,14 @@ public class PositionUtil {
     }
     return Optional.empty();
   }
+    catch(Exception e){
+      return Optional.empty();
+    }
+  }
 
   public static Optional<CtElement> getClosestMatch(CtModel model, String uri, Position position) {
-    // Search the type with the uri first.
+    try {
+          // Search the type with the uri first.
     // if the type is unknown here, we can stop and return instant.
     Optional<CtType<?>> searchedType = findMatchingType(model, convertURItoPath(uri));
     if (searchedType.isEmpty()) {
@@ -124,6 +130,9 @@ public class PositionUtil {
               abs(o2.getPosition().getLine() - (position.getLine() + 1))));
     }
     return Optional.empty();
+    } catch (Exception e) {
+      return Optional.empty();
+    }
   }
 
   private static Optional<CtType<?>> findMatchingType(CtModel model, List<String> pathParts) {
@@ -170,7 +179,7 @@ public class PositionUtil {
       return Collections.emptyList();
       // this exception comes, when we get a text document via IDEs gotoSourceFile and it's not part of the project files. 
     }
-  }
+      }
 
   public static List<Position> convertRange(Range range, TextDocumentItem document) {
     List<Position> result = new ArrayList<>();
