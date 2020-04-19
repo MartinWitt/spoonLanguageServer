@@ -3,7 +3,7 @@ package xyz.keksdose.spoon.langserver;
 import static java.util.Collections.emptySet;
 import java.io.File;
 import java.util.Set;
-import spoon.Launcher;
+import spoon.IncrementalLauncher;
 import spoon.SpoonException;
 import spoon.reflect.CtModel;
 import spoon.support.compiler.VirtualFile;
@@ -11,7 +11,7 @@ import spoon.support.compiler.VirtualFile;
 public class Compiler {
 
 
-  private Launcher launcher;
+  private IncrementalLauncher launcher;
   private String cachePath = ".spoonCache";
   private File cacheDir;
 
@@ -23,7 +23,7 @@ public class Compiler {
 
   private void createLauncher(Set<VirtualFile> files) {
 
-    launcher = new Launcher();
+    launcher = new IncrementalLauncher(emptySet(),emptySet(),cacheDir,false);
     files.forEach(launcher::addInputResource);
     launcher.getEnvironment().setNoClasspath(true);
     launcher.getEnvironment().setAutoImports(true);

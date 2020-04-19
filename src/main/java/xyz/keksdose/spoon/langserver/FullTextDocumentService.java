@@ -1,16 +1,21 @@
 package xyz.keksdose.spoon.langserver;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
@@ -86,8 +91,6 @@ public class FullTextDocumentService implements TextDocumentService {
 
   @Override
   public void didClose(DidCloseTextDocumentParams params) {
-    String uri = params.getTextDocument().getUri();
-    documents.remove(uri);
   }
 
   @Override
@@ -135,8 +138,8 @@ public class FullTextDocumentService implements TextDocumentService {
   @Override
   public CompletableFuture<List<Either<Command, CodeAction>>> codeAction(CodeActionParams params) {
     String uri = params.getTextDocument().getUri();
-    List<CodeAction> actions = new CodeActionManager().getAvailableCodeActions(compiler.getModel(), uri,
-        params.getRange(), documents.get(uri));
+    List<CodeAction> actions = new ArrayList<>(new CodeActionManager()
+        .getAvailableCodeActions(compiler.getModel(), uri, params.getRange(), documents.get(uri)));
     List<Either<Command, CodeAction>> resultList = new ArrayList<>();
     for (CodeAction codeAction : actions) {
       resultList.add(Either.forRight(codeAction));
@@ -151,10 +154,40 @@ public class FullTextDocumentService implements TextDocumentService {
     Position start = new Position(0, 0);
     Position end = new Position(lastLine, lastChar);
     Range range = new Range(start, end);
-    List<Diagnostic> result = new ArrayList<>(new CodeActionManager().getAvailableHighlight(compiler.getModel(),
-        uri, range, documents.get(uri)));
+    List<Diagnostic> result = new ArrayList<>(new CodeActionManager()
+        .getAvailableHighlight(compiler.getModel(), uri, range, documents.get(uri)));
     client.publishDiagnostics(new PublishDiagnosticsParams(uri, result));
   }
-
+  /**
+   * Creates textdocuments for all java files in project folder. If the user opens a "faked" textdocument, the client sends the real.
+   * This allows spoon to create a model from all java files in a project and not the opened ones only.  
+   * @param uri path to root folder
+   */
+  public void addFilesToModel(String uri) {
+    Path path;
+    try {
+      path = Paths.get(new URI(uri));
+    } catch (URISyntaxException e) {
+      Logger.getAnonymousLogger().info(e.getStackTrace().toString());
+      return;
+    }
+    try (Stream<Path> walk = Files.walk(path)) {
+      walk.filter(Files::isRegularFile)
+          .map(Path::toFile)
+          .filter(v -> v.getName().endsWith(".java"))
+          .forEach(v ->
+            {
+              try {
+                TextDocumentItem file = new TextDocumentItem(v.toURI().toString(), "java", 1,
+                    Files.readString(v.toPath()));
+                documents.put(file.getUri(), file);
+              } catch (IOException e) {
+                Logger.getAnonymousLogger().info(e.getStackTrace().toString());
+              }
+            });
+    } catch (IOException e) {
+      Logger.getAnonymousLogger().info(e.getStackTrace().toString());
+    }
+  }
 
 }

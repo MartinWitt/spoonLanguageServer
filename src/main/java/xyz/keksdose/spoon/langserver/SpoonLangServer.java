@@ -36,6 +36,11 @@ public class SpoonLangServer implements LanguageServer, LanguageClientAware {
     capabilities.setCodeActionProvider(true);
     capabilities.setHoverProvider(true);
     //capabilities.setCodeLensProvider(new CodeLensOptions(true));
+    if(params.getWorkspaceFolders() == null) {
+      fullTextDocumentService.addFilesToModel(params.getRootUri());}
+    else {
+      params.getWorkspaceFolders().forEach(v->fullTextDocumentService.addFilesToModel(v.getUri()));
+    }
     return CompletableFuture.completedFuture(new InitializeResult(capabilities));
   }
 
